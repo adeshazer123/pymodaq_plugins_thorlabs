@@ -187,10 +187,11 @@ class Piezo(Kinesis):
         return voltage
     
     def stop(self):
-        # FIXME: 
-        """       
-        """
-        self._connect.Stop(0)    
+        # # FIXME: 
+        # """       
+        # """
+        # self._connect.Stop(0)    
+        pass
 
     def close(self):
         self._device.Disconnect()
