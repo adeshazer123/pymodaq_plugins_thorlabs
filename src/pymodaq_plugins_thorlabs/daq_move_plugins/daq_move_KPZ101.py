@@ -94,17 +94,14 @@ class DAQ_Move_KPZ101(DAQ_Move_base):
         """
         Moves the Kinesis Piezo Stage relatively to the current position. 
         """
-        position = self.check_bound(self.current_position + position) - self.current_position
         self.target_position = position + self.current_position
-        position = self.set_position_relative_with_scaling(position)
 
-        self.controller.move_abs(self.target_position)
+        self.move_abs(self.target_position)
 
     def move_home(self):
         """
         Move the Kinesis Piezo Stage to home position
         """
-        # self.controller.home(callback=self.move_done)
         self.move_abs(0)
         
 if __name__ == '__main__':

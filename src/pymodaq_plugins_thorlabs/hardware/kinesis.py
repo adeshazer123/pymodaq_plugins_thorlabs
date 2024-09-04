@@ -161,30 +161,15 @@ class Piezo(Kinesis):
         else:
             raise ValueError('Invalid Serial Number')
     
-    def move_abs(self, position : float, callback = None):
+    def move_abs(self, position : float, callback = None):                    
         min_volt = 0.0 #TODO: Check is value converts from float to Decimal. 
         max_volt = Decimal.ToDouble(self._device.GetMaxOutputVoltage()) # float
         if position >= min_volt and position <= max_volt:
-            self._device.SetOutputVoltage(Decimal(position)) #TODO: check if needs one command or two allowed
+            self._device.SetOutputVoltage(Decimal(position))
         else:
             raise ValueError('Invalid Voltage')
-
-    def home(self, callback=None):
-        if callback is not None:
-            callback = Action[UInt64](callback)
-        else:
-            callback = 0
-
-        self.move_abs(0.0) #Not a precise home value. 
-
 
     def get_position(self):
         voltage = Decimal.ToDouble(self._device.GetOutputVoltage())
         return voltage
-    
-    def stop(self):
-        pass
-
-    def close(self):
-        self._device.Disconnect()
     
