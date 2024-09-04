@@ -15,7 +15,7 @@ class DAQ_Move_KPZ101(DAQ_Move_base):
     Wrapper object to access Piezo functionalities, similar to Kinesis instruments 
     """
     _controller_units = 'V'
-    _epsilon = 0.0
+    _epsilon = 0.005
 
     is_multiaxes = False
 

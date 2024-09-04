@@ -1,8 +1,7 @@
 import clr
 import sys
 from os import system
-#import System
-#from decimal import Decimal
+import time
 from System import Decimal
 from System import Action
 from System import UInt64
@@ -145,14 +144,18 @@ class Flipper(Kinesis):
 class Piezo(Kinesis):
     def __init__(self):
         self._device: KCubePiezo.KCubePiezo = None
-        self._connect = None
-        # self._voltage: GenericPiezo.GenericPiezo = None
 
     def connect(self, serial: int):
         if serial in serialnumbers_piezo:
             self._device = KCubePiezo.KCubePiezo.CreateKCubePiezo(serial)
             super().connect(serial)
-            self._device.EnableDevice() #TODO: Delete or keep depending if necessary 
+
+            self._device.EnableDevice()
+            time.sleep(0.25)  # Wait for device to enable
+
+            device_config = self._device.GetPiezoConfiguration(serial)
+            self._device.SetZero()
+
             if not (self._device.IsSettingsInitialized()):
                 raise (Exception("no Stage Connected"))
         else:
@@ -174,33 +177,14 @@ class Piezo(Kinesis):
 
         self.move_abs(0.0) #Not a precise home value. 
 
-    # def move_rel(self, position, callback=None): #Testing purposes
-    #     if callback is not None:
-    #         callback = Action[UInt64](callback)
-    #     else:
-    #         callback = Decimal(0.0) #TODO: Check if this is the correct value for no callback
-    #         position = Decimal(self.get_position) #TODO: Check if Decimal() is necessary
-    #     self._device.MoveRelative(Generic.MotorDirection.Forward, position, callback)
 
     def get_position(self):
         voltage = Decimal.ToDouble(self._device.GetOutputVoltage())
         return voltage
     
     def stop(self):
-        # # FIXME: 
-        # """       
-        # """
-        # self._connect.Stop(0)    
         pass
 
     def close(self):
         self._device.Disconnect()
     
-    
-    # @property
-    # def backlash(self):
-    #     pass    
-
-    # @backlash.setter
-    # def backlash(self, backlash: float):
-    #     pass
