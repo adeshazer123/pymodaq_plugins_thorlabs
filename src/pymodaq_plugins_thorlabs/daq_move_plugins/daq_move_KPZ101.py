@@ -49,8 +49,6 @@ class DAQ_Move_KPZ101(DAQ_Move_base):
         info = self.controller.name
         self.settings.child('controller_id').setValue(info)
 
-        #self.controller.backlash = self.settings['backlash']
-
         initialized = True
         return info, initialized
 
@@ -67,8 +65,7 @@ class DAQ_Move_KPZ101(DAQ_Move_base):
             --------
             DAQ_Move_base.move_done
         """
-        if self.controller is not None:
-            self.controller.stop()
+        pass
 
     def get_actuator_value(self):
         """
@@ -78,8 +75,6 @@ class DAQ_Move_KPZ101(DAQ_Move_base):
             --------
             DAQ_Move_base.get_position_with_scaling, daq_utils.ThreadCommand
         """
-        # pos = self.settings['get_voltage']
-        # return pos
         pos = self.controller.get_position()
         pos = self.get_position_with_scaling(pos) #TODO: Check if this converts voltage to position
         return pos
@@ -93,13 +88,13 @@ class DAQ_Move_KPZ101(DAQ_Move_base):
         self.target_position = position
         position = self.set_position_with_scaling(position)
 
-        self.controller.move_abs(position) #TODO: Check if self.controller communicates with Piezo(Kinesis)
+        self.controller.move_abs(position)
 
     def move_rel(self, position):
         """
         Moves the Kinesis Piezo Stage relatively to the current position. 
         """
-        position = self.check_bound(self.current_position + position) - self.current_position #TODO: Check if need to replace with self.get_actuator_value()
+        position = self.check_bound(self.current_position + position) - self.current_position
         self.target_position = position + self.current_position
         position = self.set_position_relative_with_scaling(position)
 
@@ -109,11 +104,8 @@ class DAQ_Move_KPZ101(DAQ_Move_base):
         """
         Move the Kinesis Piezo Stage to home position
         """
-        # home = self.settings['home_position']
-        # self.target_position = home
-        # self.controller.move_home(home)
-        self.controller.home(callback=self.move_done)
-
-
+        # self.controller.home(callback=self.move_done)
+        self.move_abs(0)
+        
 if __name__ == '__main__':
     main(__file__, init=False)
