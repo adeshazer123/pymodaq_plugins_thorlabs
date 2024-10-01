@@ -1,6 +1,7 @@
-from pymodaq.control_modules.move_utility_classes import DAQ_Move_base, main, comon_parameters_fun
+from pymodaq.control_modules.move_utility_classes import DAQ_Move_base, main, comon_parameters_fun, DataActuatorType
 from pymodaq.utils.logger import set_logger, get_module_name
-
+from typing import Union, List, Dict
+from pymodaq.utils.daq_utils import ThreadCommand
 from pymodaq_plugins_thorlabs.hardware.kinesis import serialnumbers_piezo, Piezo
 
 
@@ -12,7 +13,9 @@ class DAQ_Move_KPZ101(DAQ_Move_base):
     Wrapper object to access Piezo functionalities, similar to Kinesis instruments 
     """
     _controller_units = 'V'
-    _epsilon = 0.0
+    _epsilon: Union[float, List[float]] = 0.1
+    _axis_names: Union[List[str], Dict[str, int]] = ['Axis1']
+    data_actuator_type = DataActuatorType.DataActuator
 
     is_multiaxes = False
 
@@ -21,7 +24,7 @@ class DAQ_Move_KPZ101(DAQ_Move_base):
     params = [{'title': 'Controller ID:', 'name': 'controller_id', 'type': 'str', 'value': '', 'readonly': True},
               {'title': 'Serial number:', 'name': 'serial_number', 'type': 'list',
                'limits': serialnumbers_piezo},
-              ] + comon_parameters_fun(is_multiaxes, epsilon=_epsilon)
+              ] + comon_parameters_fun(is_multiaxes,axis_names = _axis_names, epsilon=_epsilon)
 
     def ini_attributes(self):
         self.controller: Piezo = None
@@ -39,6 +42,7 @@ class DAQ_Move_KPZ101(DAQ_Move_base):
         self.controller = self.ini_stage_init(controller, Piezo())
 
         if self.settings['multiaxes', 'multi_status'] == "Master":
+            self.is_master = True
             self.controller.connect(self.settings['serial_number'])
 
         info = self.controller.name
