@@ -14,17 +14,17 @@ class DAQ_Move_KPZ101(DAQ_Move_base):
     Wrapper object to access Piezo functionalities, similar to Kinesis instruments 
     """
     _controller_units = 'V'
-    _axes_names = {'X-axis'}
+    _axes_names = ['X-axis']
     _epsilon = 0.01
     data_actuator_type = DataActuatorType.DataActuator
 
-    # is_multiaxes = False
+    is_multiaxes = False
     logger.error('This plugin is not yet compatible with multi-axes')
 
     params = [{'title': 'Controller ID:', 'name': 'controller_id', 'type': 'str', 'value': '', 'readonly': True},
               {'title': 'Serial number:', 'name': 'serial_number', 'type': 'list',
                'limits': serialnumbers_piezo},
-              ] + comon_parameters_fun(is_multiaxes, epsilon=_epsilon)
+              ] + comon_parameters_fun(is_multiaxes, axes_name = _axes_names, epsilon=_epsilon)
 
     def ini_attributes(self):
         try:
