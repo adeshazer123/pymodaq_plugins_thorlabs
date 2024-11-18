@@ -16,16 +16,19 @@ clr.AddReference("Thorlabs.MotionControl.IntegratedStepperMotorsCLI")
 clr.AddReference("Thorlabs.MotionControl.DeviceManagerCLI")
 clr.AddReference("Thorlabs.MotionControl.GenericMotorCLI")
 clr.AddReference("Thorlabs.MotionControl.FilterFlipperCLI")
+clr.AddReference("Thorlabs.MotionContro.KCube.DCServoCLI")
 
 import Thorlabs.MotionControl.FilterFlipperCLI as FilterFlipper
 import Thorlabs.MotionControl.IntegratedStepperMotorsCLI as Integrated
 import Thorlabs.MotionControl.DeviceManagerCLI as Device
 import Thorlabs.MotionControl.GenericMotorCLI as Generic
+import Thorlabs.MotionControl.KCube.DCServoCLI as KCube
 
 
 Device.DeviceManagerCLI.BuildDeviceList()
 serialnumbers_integrated_stepper = [str(ser) for ser in Device.DeviceManagerCLI.GetDeviceList(Integrated.CageRotator.DevicePrefix)]
 serialnumbers_flipper = [str(ser) for ser in Device.DeviceManagerCLI.GetDeviceList(FilterFlipper.FilterFlipper.DevicePrefix)]
+serialnumbers_kdc101 = [str(ser) for ser in Device.DeviceManagerCLI.GetDeviceList(KCube.DCServo.DevicePrefix)]
 
 
 class Kinesis:
@@ -134,3 +137,11 @@ class Flipper(Kinesis):
         else:
             position = 1
         return position
+
+class KDC101(Kinesis):
+    def __init__(self):
+        self._device: KCube.DCServo = None
+    
+    def connect(self, serial: int):
+        if serial in serialnumbers_kdc101:
+            self._device = KCube.DCServo.CreateDCServo(serial)
