@@ -16,7 +16,7 @@ clr.AddReference("Thorlabs.MotionControl.IntegratedStepperMotorsCLI")
 clr.AddReference("Thorlabs.MotionControl.DeviceManagerCLI")
 clr.AddReference("Thorlabs.MotionControl.GenericMotorCLI")
 clr.AddReference("Thorlabs.MotionControl.FilterFlipperCLI")
-clr.AddReference("Thorlabs.MotionContro.KCube.DCServoCLI")
+clr.AddReference("Thorlabs.MotionControl.KCube.DCServoCLI")
 
 import Thorlabs.MotionControl.FilterFlipperCLI as FilterFlipper
 import Thorlabs.MotionControl.IntegratedStepperMotorsCLI as Integrated
@@ -145,3 +145,25 @@ class KDC101(Kinesis):
     def connect(self, serial: int):
         if serial in serialnumbers_kdc101:
             self._device = KCube.DCServo.CreateDCServo(serial)
+            super().connect(serial)
+            if not (self._device.IsSettingsInitialized()):
+                raise (Exception("no Stage Connected"))
+        else:
+            raise ValueError('Invalid Serial Number')
+    
+    def get_position(self):
+        return Decimal.ToDouble(self._device.RequestPosition())
+    
+    def move_abs(self, position: float, callback=None):
+        if callback is not None:
+            callback = Action[UInt64](callback)
+        else:
+            callback = 0
+        self._device.SetPosition(Decimal(position), callback)
+        
+    def home(self, callback=None):
+        if callback is not None:
+            callback = Action[UInt64](callback)
+        else:
+            callback = 0
+        self._device.Home(callback) 
