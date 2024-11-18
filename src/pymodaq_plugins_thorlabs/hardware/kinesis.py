@@ -18,18 +18,21 @@ clr.AddReference("Thorlabs.MotionControl.DeviceManagerCLI")
 clr.AddReference("Thorlabs.MotionControl.GenericMotorCLI")
 clr.AddReference("Thorlabs.MotionControl.FilterFlipperCLI")
 clr.AddReference("Thorlabs.MotionControl.Benchtop.BrushlessMotorCLI")
+clr.AddReference("Thorlabs.MotionControl.KCube.DCServoCLI")
 
 import Thorlabs.MotionControl.FilterFlipperCLI as FilterFlipper
 import Thorlabs.MotionControl.IntegratedStepperMotorsCLI as Integrated
 import Thorlabs.MotionControl.DeviceManagerCLI as Device
 import Thorlabs.MotionControl.GenericMotorCLI as Generic
 import Thorlabs.MotionControl.Benchtop.BrushlessMotorCLI as BrushlessMotorCLI
+import Thorlabs.MotionControl.KCube.DCServoCLI as KCube
 
 
 Device.DeviceManagerCLI.BuildDeviceList()
 serialnumbers_integrated_stepper = [str(ser) for ser in Device.DeviceManagerCLI.GetDeviceList(Integrated.CageRotator.DevicePrefix)]
 serialnumbers_flipper = [str(ser) for ser in Device.DeviceManagerCLI.GetDeviceList(FilterFlipper.FilterFlipper.DevicePrefix)]
 serialnumbers_brushless = [str(ser) for ser in Device.DeviceManagerCLI.GetDeviceList(BrushlessMotorCLI.BenchtopBrushlessMotor.DevicePrefix)]
+serialnumbers_kdc101 = [str(ser) for ser in Device.DeviceManagerCLI.GetDeviceList(KCube.DCServo.DevicePrefix)]
 
 
 class Kinesis:
@@ -288,6 +291,36 @@ class Flipper(Kinesis):
         else:
             position = 1
         return position
+
+class KDC101(Kinesis):
+    def __init__(self):
+        self._device: KCube.DCServo = None
+
+    def connect(self, serial: int):
+        if serial in serialnumbers_kdc101:
+            self._device = KCube.DCServo.CreateDCServo(serial)
+            super().connect(serial)
+            if not (self._device.IsSettingsInitialized()):
+                raise (Exception("no Stage Connected"))
+        else:
+            raise ValueError('Invalid Serial Number')
+
+    def get_position(self):
+        return Decimal.ToDouble(self._device.RequestPosition())
+
+    def move_abs(self, position: float, callback=None):
+        if callback is not None:
+            callback = Action[UInt64](callback)
+        else:
+            callback = 0
+        self._device.SetPosition(Decimal(position), callback)
+
+    def home(self, callback=None):
+        if callback is not None:
+            callback = Action[UInt64](callback)
+        else:
+            callback = 0
+        self._device.Home(callback)
 
 
 if __name__ == '__main__':
