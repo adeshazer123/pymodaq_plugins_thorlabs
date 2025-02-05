@@ -101,14 +101,6 @@ class DAQ_Move_Elliptec(DAQ_Move_base):
             units = self.controller.get_units(self.axis_value)
             self.axis_unit = units
 
-            # serial = Controller(self.settings['com_port'])
-            # self.rotator = Rotator(serial)
-
-            # #Gather all info from instrument 
-            # all_info = self.rotator.get('info')
-            # self.settings.child('serial').setValue(all_info['Serial No.'])
-            # self.settings.child('motor').setValue(all_info['Motor Type'])
-            # self.settings.child('range').setValue(all_info['Range'])
         """
         info = {'Address': addr,
                 'Motor Type': int(msg[3:5], 16),
